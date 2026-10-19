@@ -573,9 +573,6 @@ class TrafficAssignmentDialog(BaseDialog):
             item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
             table.setItem(idx, i, item)
 
-        # self.class_shortcut = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.class_shortcut)
-        # self.class_shortcut.activated.connect(self.__remove_class)
-
         but = QPushButton()
         but.setText(self.tr("Remove"))
         but.clicked.connect(self.__remove_class)
