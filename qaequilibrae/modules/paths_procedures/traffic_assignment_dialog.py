@@ -19,7 +19,7 @@ from qgis.PyQt.QtWidgets import (
     QCheckBox,
     QPushButton,
     QAbstractItemView,
-    QShortcut
+    QShortcut,
 )
 
 from .create_py_strings import create_strings
