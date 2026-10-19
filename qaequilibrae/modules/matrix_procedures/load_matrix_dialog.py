@@ -63,7 +63,8 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
 
         self.but_permanent_save.clicked.connect(self.get_name_and_save_to_disk)
 
-        self.slots_shortcut = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.slots_shortcut)
+        self.slots_shortcut = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.matrix_list_view)
+        self.slots_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.slots_shortcut.activated.connect(self.slot_double_clicked)
 
         # THIRD, we load layers in the canvas to the combo-boxes
