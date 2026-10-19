@@ -93,13 +93,18 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
 
     def slot_double_clicked(self, mi=None):
         if mi is None:
-            mi = self.list_matrices.currentIndex()
-        row = mi.row()
-        if row > -1:
-            self.matrix_count -= 1
-            mat_to_remove = self.matrix_list_view.item(row, 0).text()
-            self.matrices.pop(mat_to_remove, None)
-            self.update_matrix_list()
+            rows = [index.row() for index in self.list_matrices.selectionModel().selectedRows()]
+            if not rows and self.list_matrices.currentRow() >= 0:
+                rows = [self.list_matrices.currentRow()]
+        else:
+            rows = [mi.row()]
+
+        for row in rows:
+            if row > -1:
+                self.matrix_count -= 1
+                mat_to_remove = self.matrix_list_view.item(row, 0).text()
+                self.matrices.pop(mat_to_remove, None)
+                self.update_matrix_list()
 
     def load_fields_to_combo_boxes(self):
         self.but_load.setEnabled(False)
