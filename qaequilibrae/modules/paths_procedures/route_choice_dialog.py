@@ -65,7 +65,8 @@ class RouteChoiceDialog(BaseDialog):
         self.tbl_selected_links.cellDoubleClicked.connect(self.__remove_select_link_item)
         self.but_clear_qry.clicked.connect(self.__clean_link_selection)
 
-        self.cell_shortcut = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.cell_shortcut)
+        self.cell_shortcut = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.tbl_selected_links)
+        self.cell_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.cell_shortcut.activated.connect(self.__remove_select_link_item)
 
         self.list_matrices()
@@ -262,11 +263,21 @@ class RouteChoiceDialog(BaseDialog):
 
         self.__current_links = []
 
-    def __remove_select_link_item(self, line):
-        key = list(self.select_links.keys())[line]
-        self.tbl_selected_links.removeRow(line)
+    def __remove_select_link_item(self, line=None):
+        if line is None:
+            rows = [index.row() for index in self.tbl_selected_links.selectionModel().selectedRows()]
+            if not rows and self.tbl_selected_links.currentRow() >= 0:
+                rows = [self.tbl_selected_links.currentRow()]
+        else:
+            rows = [line]
+        rows = sorted({row for row in rows if 0 <= row < self.tbl_selected_links.rowCount()}, reverse=True)
+        if not rows:
+            return
+        for row in rows:
+            key = list(self.select_links.keys())[row]
+            self.tbl_selected_links.removeRow(row)
 
-        self.select_links.pop(key)
+            self.select_links.pop(key)
 
     def __clean_link_selection(self):
         self.ln_qry_name.clear()
