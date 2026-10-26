@@ -84,7 +84,7 @@ class RunLogDialog(LiveLogDialog):
         self.setWindowTitle(self.tr("Model Run"))
 
         self.cancel_button = QPushButton("Cancel")
-        self.buttons.addButton(self.cancel_button, QDialogButtonBox.DestructiveRole)
+        self.buttons.addButton(self.cancel_button, QDialogButtonBox.ButtonRole.DestructiveRole)
         self.cancel_button.clicked.connect(self.cancel_actions_function)
 
     def cancel_actions_function(self):
