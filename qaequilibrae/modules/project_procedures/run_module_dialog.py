@@ -370,7 +370,7 @@ class RunModuleDialog(BaseDialog):
             flags=QgsTask.CanCancel if cancelable else QgsTask.AllFlags,
         )
         task_id = QgsApplication.taskManager().addTask(self.task)
-        if task_id != 0:
+        if task_id != 0: 
             self.log_dialog.set_task_id(task_id)
 
     def _worker(self, func, outcome, passTask):
