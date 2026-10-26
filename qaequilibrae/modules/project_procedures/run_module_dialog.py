@@ -79,11 +79,11 @@ LogBridge = LiveLogBridge
 
 
 class RunLogDialog(LiveLogDialog):
-    def __init__(self, parent=None, cancel=False):
+    def __init__(self, parent=None, cancelable=False):
         super().__init__("", parent=parent, initial_indeterminate=True)
         self.setWindowTitle(self.tr("Model Run"))
 
-        if cancel:
+        if cancelable:
             self.cancel_button = QPushButton("Cancel")
             self.buttons.addButton(self.cancel_button, QDialogButtonBox.ButtonRole.DestructiveRole)
             self.cancel_button.clicked.connect(self.cancel_actions_function)
@@ -346,8 +346,8 @@ class RunModuleDialog(BaseDialog):
             # Log windows from earlier runs stay parented to this dialog otherwise
             self.log_dialog.deleteLater()
         cancelable = (
-            "cancel" in self.project.parameters["run"][func_name]
-            and self.project.parameters["run"][func_name]["cancel"]
+            "cancelable" in self.project.parameters["run"][func_name]
+            and self.project.parameters["run"][func_name]["cancelable"]
         )
 
         self.log_dialog = RunLogDialog(self, cancelable)
