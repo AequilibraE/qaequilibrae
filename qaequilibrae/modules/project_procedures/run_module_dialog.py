@@ -84,6 +84,7 @@ class RunLogDialog(LiveLogDialog):
         self.setWindowTitle(self.tr("Model Run"))
 
         if cancelable:
+            # Add generic button to cancel
             self.cancel_button = QPushButton("Cancel")
             self.buttons.addButton(self.cancel_button, QDialogButtonBox.ActionRole)
             self.cancel_button.clicked.connect(self.cancel_actions_function)
@@ -345,6 +346,8 @@ class RunModuleDialog(BaseDialog):
         if self.log_dialog is not None and not sip.isdeleted(self.log_dialog):
             # Log windows from earlier runs stay parented to this dialog otherwise
             self.log_dialog.deleteLater()
+
+        # enables the cancelable option
         cancelable = (
             "cancelable" in self.project.parameters["run"][func_name]
             and self.project.parameters["run"][func_name]["cancelable"]
@@ -365,10 +368,11 @@ class RunModuleDialog(BaseDialog):
         outcome = {}
         self.task = QgsTask.fromFunction(
             self.tr("Running {}").format(func_name),
-            self._worker(func, outcome, cancelable),
+            self._worker(func, outcome, cancelable), # passTask = cancelable -> need to pass task to cancel
             on_finished=self._on_finished(func_name, outcome),
             flags=QgsTask.CanCancel if cancelable else QgsTask.AllFlags,
         )
+        # Task id to send cancel signal
         task_id = QgsApplication.taskManager().addTask(self.task)
         if task_id != 0: 
             self.log_dialog.set_task_id(task_id)
