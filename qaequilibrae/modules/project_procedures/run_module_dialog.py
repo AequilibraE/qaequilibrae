@@ -85,7 +85,7 @@ class RunLogDialog(LiveLogDialog):
 
         if cancelable:
             self.cancel_button = QPushButton("Cancel")
-            self.buttons.addButton(self.cancel_button, QDialogButtonBox.ButtonRole.DestructiveRole)
+            self.buttons.addButton(self.cancel_button, QDialogButtonBox.ActionRole)
             self.cancel_button.clicked.connect(self.cancel_actions_function)
 
     def set_task_id(self, task_id):
