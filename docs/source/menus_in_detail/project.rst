@@ -89,6 +89,31 @@ the 'Run procedures' to validate the installation.
     :align: center
     :alt: run module missing requirements
 
+To be able to cancel a procedure mid-run, include a `task` and `cancel` argument in the function definition. In the `parameters.yml` file,
+include the `cancel` argument and set it to true. In the task, manually query `task.isCanceled()` and cancel your task. 
+Then to cancel, click the 'Cancel' button after starting the task.
+
+An example of a function is:
+
+.. code-block:: python
+
+    def test_procedure_ping(task, cancel=True):
+        host = "google.com"
+        command = ['ping', '-n', '1', host]
+        for _ in range(10):
+            if task.isCanceled():
+                return
+            subprocess.run(command, capture_output=True, text=True)
+
+And in the `parameters.yml` file:
+
+.. code-block:: yml
+
+    run:
+      test_procedure_ping:
+        cancel: true
+
+
 Scenarios
 ---------
 
