@@ -11,7 +11,7 @@ from pathlib import Path
 from qgis.core import Qgis, QgsApplication, QgsMessageLog, QgsTask
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import QTimer, pyqtSignal
-from qgis.PyQt.QtWidgets import QMessageBox
+from qgis.PyQt.QtWidgets import (QMessageBox, QPushButton, QDialogButtonBox)
 
 from qaequilibrae.download_extra_packages_class import DownloadAll
 from qaequilibrae.modules.common_tools import BaseDialog, LiveLogBridge, LiveLogDialog
@@ -80,8 +80,17 @@ LogBridge = LiveLogBridge
 
 class RunLogDialog(LiveLogDialog):
     def __init__(self, parent=None):
-        super().__init__("", parent=parent, initial_indeterminate=True)
+        super().__init__("", parent=parent, initial_indeterminate=True, cancel=True)
         self.setWindowTitle(self.tr("Model Run"))
+
+        self.cancel_button = QPushButton("Cancel")
+        self.buttons.addButton(self.cancel_button, QDialogButtonBox.DestructiveRole)
+        self.cancel_button.clicked.connect(self.cancel_actions_function)
+
+    def cancel_actions_function(self):
+        QgsApplication.taskManager().cancelAll()
+        QgsMessageLog.logMessage(self.tr("Model run canceled"), MESSAGE_TAG, Qgis.MessageLevel.Info)
+        self.close()
 
 
 class LogTailer:
@@ -406,7 +415,7 @@ class RunModuleDialog(BaseDialog):
 
             try:
                 if canceled:
-                    self.qgis_project.iface_error_message(canceled_msg)
+                    self.qgis_project.iface_info_message(canceled_msg)
                     return
 
                 if exception is not None:

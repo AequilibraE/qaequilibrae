@@ -7,6 +7,7 @@ from qgis.PyQt.QtWidgets import (
     QLabel,
     QPlainTextEdit,
     QProgressBar,
+    QPushButton,
     QVBoxLayout,
     QWidget,
 )
@@ -125,7 +126,7 @@ def connect_progress_widgets(bridge, progressbar, progress_label, *, clear_on_fi
 
 
 class LiveLogDialog(QDialog):
-    def __init__(self, title, parent=None, *, initial_indeterminate=False):
+    def __init__(self, title, parent=None, *, initial_indeterminate=False, cancel=False):
         super().__init__(parent)
 
         self.setWindowTitle(title)
@@ -136,8 +137,9 @@ class LiveLogDialog(QDialog):
         self.log = LiveLogWidget(self, initial_indeterminate=initial_indeterminate)
         layout.addWidget(self.log)
 
-        self.buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close | QDialogButtonBox.StandardButton.Cancel)
+        self.buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         self.buttons.rejected.connect(self.reject)
+
         layout.addWidget(self.buttons)
 
         self.setLayout(layout)
