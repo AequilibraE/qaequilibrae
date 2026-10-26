@@ -76,6 +76,27 @@ def test_double_click_removes_a_skim(sf_project, qtbot):
     dialog.close()
 
 
+def test_delete_shortcut_removes_selected_skim(sf_project, qtbot):
+    dialog = TrafficAssignmentDialog(sf_project)
+    _add_car_class(dialog, qtbot)
+
+    for field in ("distance", "free_flow_time"):
+        dialog.cob_skims_available.setCurrentText(field)
+        qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
+
+    dialog.skim_list_table.selectRow(1)
+    dialog.skim_list_shortcut.activated.emit()
+
+    assert dialog.skims["car"] == ["distance"]
+    assert dialog.skim_list_table.rowCount() == 1
+    assert dialog.skim_list_table.item(0, 1).text() == "distance"
+
+    dialog.skim_list_shortcut.activated.emit()
+    assert dialog.skim_list_table.rowCount() == 1
+
+    dialog.close()
+
+
 def _available_skims(dialog):
     combo = dialog.cob_skims_available
     return [combo.itemText(i) for i in range(combo.count())]
