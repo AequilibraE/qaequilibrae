@@ -87,9 +87,14 @@ class RunLogDialog(LiveLogDialog):
             self.cancel_button = QPushButton("Cancel")
             self.buttons.addButton(self.cancel_button, QDialogButtonBox.ButtonRole.DestructiveRole)
             self.cancel_button.clicked.connect(self.cancel_actions_function)
+    
+    def set_task_id(self, task_id):
+        self.task_id = task_id
 
     def cancel_actions_function(self):
-        QgsApplication.taskManager().cancelAll()
+        if self.task_id is None:
+            QgsMessageLog.logMessage(self.tr("Cannot cancel task without task id"), MESSAGE_TAG, Qgis.MessageLevel.Warning)
+        QgsApplication.taskManager().task(self.task_id).cancel()
         QgsMessageLog.logMessage(self.tr("Model run canceled"), MESSAGE_TAG, Qgis.MessageLevel.Info)
         self.close()
 
@@ -361,7 +366,9 @@ class RunModuleDialog(BaseDialog):
             on_finished=self._on_finished(func_name, outcome),
             flags=QgsTask.CanCancel if cancelable else QgsTask.AllFlags,
         )
-        QgsApplication.taskManager().addTask(self.task)
+        task_id = QgsApplication.taskManager().addTask(self.task)
+        if task_id is not 0:
+            self.log_dialog.set_task_id(task_id)
 
     def _worker(self, func, outcome, passTask):
         """
