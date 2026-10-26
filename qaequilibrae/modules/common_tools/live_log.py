@@ -136,7 +136,7 @@ class LiveLogDialog(QDialog):
         self.log = LiveLogWidget(self, initial_indeterminate=initial_indeterminate)
         layout.addWidget(self.log)
 
-        self.buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+        self.buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close | QDialogButtonBox.StandardButton.Cancel)
         self.buttons.rejected.connect(self.reject)
         layout.addWidget(self.buttons)
 
