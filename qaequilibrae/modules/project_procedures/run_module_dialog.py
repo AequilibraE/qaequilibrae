@@ -79,13 +79,14 @@ LogBridge = LiveLogBridge
 
 
 class RunLogDialog(LiveLogDialog):
-    def __init__(self, parent=None):
-        super().__init__("", parent=parent, initial_indeterminate=True, cancel=True)
+    def __init__(self, parent=None, cancel=False):
+        super().__init__("", parent=parent, initial_indeterminate=True)
         self.setWindowTitle(self.tr("Model Run"))
 
-        self.cancel_button = QPushButton("Cancel")
-        self.buttons.addButton(self.cancel_button, QDialogButtonBox.ButtonRole.DestructiveRole)
-        self.cancel_button.clicked.connect(self.cancel_actions_function)
+        if cancel:
+            self.cancel_button = QPushButton("Cancel")
+            self.buttons.addButton(self.cancel_button, QDialogButtonBox.ButtonRole.DestructiveRole)
+            self.cancel_button.clicked.connect(self.cancel_actions_function)
 
     def cancel_actions_function(self):
         QgsApplication.taskManager().cancelAll()
@@ -337,7 +338,11 @@ class RunModuleDialog(BaseDialog):
         if self.log_dialog is not None and not sip.isdeleted(self.log_dialog):
             # Log windows from earlier runs stay parented to this dialog otherwise
             self.log_dialog.deleteLater()
-        self.log_dialog = RunLogDialog(self)
+        cancelable = (
+            "cancel" in self.project.parameters["run"][func_name]
+            and self.project.parameters["run"][func_name]["cancel"]
+            )
+        self.log_dialog = RunLogDialog(self, cancelable)
         self.log_dialog.connect_bridge(self.bridge)
         self.log_dialog.show()
 
@@ -352,14 +357,17 @@ class RunModuleDialog(BaseDialog):
         outcome = {}
         self.task = QgsTask.fromFunction(
             self.tr("Running {}").format(func_name),
-            self._worker(func, outcome),
+            self._worker(func, outcome, cancelable),
             on_finished=self._on_finished(func_name, outcome),
-            flags=QgsTask.Silent,
+            flags=QgsTask.CanCancel if cancelable else QgsTask.AllFlags,
         )
         QgsApplication.taskManager().addTask(self.task)
 
-    def _worker(self, func, outcome):
-        """Build the background callable without touching dialog state there."""
+    def _worker(self, func, outcome, passTask):
+        """
+        Build the background callable without touching dialog state there.
+        Pass the task to the function if requested (usually if cancelable)
+        """
         bridge = self.bridge
         running_msg = self.tr("Model running, please wait...")
         done_msg = self.tr("Model run finished!")
@@ -378,7 +386,7 @@ class RunModuleDialog(BaseDialog):
 
             try:
                 QgsMessageLog.logMessage(running_msg, MESSAGE_TAG, Qgis.MessageLevel.Info)
-                outcome["result"] = func()
+                outcome["result"] = func() if not passTask else func(task=task)
                 QgsMessageLog.logMessage(done_msg, MESSAGE_TAG, Qgis.MessageLevel.Info)
 
             except Exception:
@@ -425,7 +433,6 @@ class RunModuleDialog(BaseDialog):
 
                 message = check_msg if has_content(result) else ""
                 self.qgis_project.iface_success_message(message, executed_msg)
-                self.qgis_project.iface.messageBar().pushMessage(f"Task complete : {func_name}")
 
                 if has_content(result):
                     self.qgis_project.message_log(pprint.pformat(result))

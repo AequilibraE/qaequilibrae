@@ -125,7 +125,7 @@ def connect_progress_widgets(bridge, progressbar, progress_label, *, clear_on_fi
 
 
 class LiveLogDialog(QDialog):
-    def __init__(self, title, parent=None, *, initial_indeterminate=False, cancel=False):
+    def __init__(self, title, parent=None, *, initial_indeterminate=False):
         super().__init__(parent)
 
         self.setWindowTitle(title)
