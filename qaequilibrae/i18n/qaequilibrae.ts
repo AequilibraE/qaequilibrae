@@ -2327,7 +2327,7 @@
 <context>
     <name>LoadMatrixDialog</name>
     <message>
-        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="262"/>
+        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="274"/>
         <source>Invalid field chosen</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3344,27 +3344,27 @@
 <context>
     <name>RouteChoiceDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="347"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="362"/>
         <source>Input error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="238"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="243"/>
         <source>Missing query name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="241"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="246"/>
         <source>Query name already used</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="244"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="249"/>
         <source>Please set a link selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="470"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="485"/>
         <source>Route choice error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4103,102 +4103,102 @@ Select-link queries specify a name, link IDs, and AB, BA, or both directions. Re
 <context>
     <name>TrafficAssignmentDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="497"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="508"/>
         <source>Class name already used</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="566"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="577"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="769"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="790"/>
         <source>Input error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="853"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="874"/>
         <source>No traffic classes to assign</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="863"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="884"/>
         <source>Missing scenario name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="869"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="890"/>
         <source>Result table name already exists. Choose a new name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="904"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="925"/>
         <source>VDF parameter is not numeric</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="696"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="717"/>
         <source>Wrong value for link ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="702"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="723"/>
         <source>Link ID doesn&apos;t exist in project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="711"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="732"/>
         <source>Missing query name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="715"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="736"/>
         <source>Query name already used</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="719"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="740"/>
         <source>Please set a link selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="875"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="896"/>
         <source>Missing select link matrix name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="879"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="900"/>
         <source>Result matrix name already exists. Choose a new name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="347"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="358"/>
         <source>No VoT found for mode {} in project database. Please configure it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="783"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="804"/>
         <source>Assignment setup error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="493"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="504"/>
         <source>Class name cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="858"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="879"/>
         <source>More than one class writes the result fields: {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="762"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="783"/>
         <source>Assignment error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="928"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="949"/>
         <source>Canceling after the current computation finishes</source>
         <translation type="unfinished"></translation>
     </message>
