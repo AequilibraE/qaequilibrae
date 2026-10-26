@@ -11,7 +11,7 @@ from pathlib import Path
 from qgis.core import Qgis, QgsApplication, QgsMessageLog, QgsTask
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import QTimer, pyqtSignal
-from qgis.PyQt.QtWidgets import QMessageBox
+from qgis.PyQt.QtWidgets import QMessageBox, QPushButton, QDialogButtonBox
 
 from qaequilibrae.download_extra_packages_class import DownloadAll
 from qaequilibrae.modules.common_tools import BaseDialog, LiveLogBridge, LiveLogDialog
@@ -79,9 +79,27 @@ LogBridge = LiveLogBridge
 
 
 class RunLogDialog(LiveLogDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, cancelable=False):
         super().__init__("", parent=parent, initial_indeterminate=True)
         self.setWindowTitle(self.tr("Model Run"))
+
+        if cancelable:
+            # Add generic button to cancel
+            self.cancel_button = QPushButton("Cancel")
+            self.buttons.addButton(self.cancel_button, QDialogButtonBox.ActionRole)
+            self.cancel_button.clicked.connect(self.cancel_actions_function)
+
+    def set_task_id(self, task_id):
+        self.task_id = task_id
+
+    def cancel_actions_function(self):
+        if self.task_id is None:
+            QgsMessageLog.logMessage(
+                self.tr("Cannot cancel task without task id"), MESSAGE_TAG, Qgis.MessageLevel.Warning
+            )
+        QgsApplication.taskManager().task(self.task_id).cancel()
+        QgsMessageLog.logMessage(self.tr("Model run canceled"), MESSAGE_TAG, Qgis.MessageLevel.Info)
+        self.close()
 
 
 class LogTailer:
@@ -328,7 +346,14 @@ class RunModuleDialog(BaseDialog):
         if self.log_dialog is not None and not sip.isdeleted(self.log_dialog):
             # Log windows from earlier runs stay parented to this dialog otherwise
             self.log_dialog.deleteLater()
-        self.log_dialog = RunLogDialog(self)
+
+        # enables the cancelable option
+        cancelable = (
+            "cancelable" in self.project.parameters["run"][func_name]
+            and self.project.parameters["run"][func_name]["cancelable"]
+        )
+
+        self.log_dialog = RunLogDialog(self, cancelable)
         self.log_dialog.connect_bridge(self.bridge)
         self.log_dialog.show()
 
@@ -343,13 +368,20 @@ class RunModuleDialog(BaseDialog):
         outcome = {}
         self.task = QgsTask.fromFunction(
             self.tr("Running {}").format(func_name),
-            self._worker(func, outcome),
+            self._worker(func, outcome, cancelable), # passTask = cancelable -> need to pass task to cancel
             on_finished=self._on_finished(func_name, outcome),
+            flags=QgsTask.CanCancel if cancelable else QgsTask.AllFlags,
         )
-        QgsApplication.taskManager().addTask(self.task)
+        # Task id to send cancel signal
+        task_id = QgsApplication.taskManager().addTask(self.task)
+        if task_id != 0: 
+            self.log_dialog.set_task_id(task_id)
 
-    def _worker(self, func, outcome):
-        """Build the background callable without touching dialog state there."""
+    def _worker(self, func, outcome, passTask):
+        """
+        Build the background callable without touching dialog state there.
+        Pass the task to the function if requested (usually if cancelable)
+        """
         bridge = self.bridge
         running_msg = self.tr("Model running, please wait...")
         done_msg = self.tr("Model run finished!")
@@ -368,7 +400,7 @@ class RunModuleDialog(BaseDialog):
 
             try:
                 QgsMessageLog.logMessage(running_msg, MESSAGE_TAG, Qgis.MessageLevel.Info)
-                outcome["result"] = func()
+                outcome["result"] = func() if not passTask else func(task=task)
                 QgsMessageLog.logMessage(done_msg, MESSAGE_TAG, Qgis.MessageLevel.Info)
 
             except Exception:
@@ -406,7 +438,7 @@ class RunModuleDialog(BaseDialog):
 
             try:
                 if canceled:
-                    self.qgis_project.iface_error_message(canceled_msg)
+                    self.qgis_project.iface_info_message(canceled_msg)
                     return
 
                 if exception is not None:
