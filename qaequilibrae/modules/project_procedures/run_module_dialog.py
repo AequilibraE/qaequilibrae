@@ -354,6 +354,7 @@ class RunModuleDialog(BaseDialog):
             self.tr("Running {}").format(func_name),
             self._worker(func, outcome),
             on_finished=self._on_finished(func_name, outcome),
+            flags=QgsTask.Silent,
         )
         QgsApplication.taskManager().addTask(self.task)
 
@@ -424,6 +425,7 @@ class RunModuleDialog(BaseDialog):
 
                 message = check_msg if has_content(result) else ""
                 self.qgis_project.iface_success_message(message, executed_msg)
+                self.qgis_project.iface.messageBar().pushMessage(f"Task complete : {func_name}")
 
                 if has_content(result):
                     self.qgis_project.message_log(pprint.pformat(result))
