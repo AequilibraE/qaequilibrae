@@ -11,7 +11,7 @@ from pathlib import Path
 from qgis.core import Qgis, QgsApplication, QgsMessageLog, QgsTask
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import QTimer, pyqtSignal
-from qgis.PyQt.QtWidgets import (QMessageBox, QPushButton, QDialogButtonBox)
+from qgis.PyQt.QtWidgets import QMessageBox, QPushButton, QDialogButtonBox
 
 from qaequilibrae.download_extra_packages_class import DownloadAll
 from qaequilibrae.modules.common_tools import BaseDialog, LiveLogBridge, LiveLogDialog
