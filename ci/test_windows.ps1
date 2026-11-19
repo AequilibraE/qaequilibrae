@@ -73,6 +73,9 @@ if ($TestReport) {
 
 Push-Location $pluginPath
 try {
+    # Run the dependency smoke test before conftest.py imports the plugin.
+    Invoke-QgisPython -Arguments @("-m", "pytest", "--noconftest", "test/test_dependency_imports.py") `
+        -FailureMessage "Dependency import smoke test failed"
     Invoke-QgisPython -Arguments $pytestArguments -FailureMessage "Pytest failed"
 }
 finally {
