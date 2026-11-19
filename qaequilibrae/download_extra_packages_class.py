@@ -105,6 +105,8 @@ class DownloadAll:
 
         python = str(self.find_python())
         install_command = ["-m", *installer, "install", *package.split(), "--target", str(self.target_folder)]
+        if sys.platform == "win32":
+            install_command += ["--constraint", str(Path(__file__).with_name("constraints-windows.txt"))]
 
         # uv chooses an interpreter of its own - virtual environments first, then its managed
         # installs, then whatever is on PATH - instead of the one running this. A QGIS install is
