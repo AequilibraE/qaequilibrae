@@ -60,21 +60,19 @@ def test_dependencies_import_with_qgis_hdf5_loaded(tmp_path):
             app = QgsApplication([], False)
             app.initQgis()
             report_hdf5()
-            # OSGeo4W installs QGIS under apps/qgis (or apps/qgis-ltr),
-            # with its shared DLLs in the installation's bin directory.
-            qgis_hdf5 = Path(QgsApplication.prefixPath()).parents[1] / "bin" / "hdf5.dll"
-            assert qgis_hdf5.is_file(), f"QGIS HDF5 DLL not found: {qgis_hdf5}"
-            print(f"Preloading QGIS HDF5: {qgis_hdf5}", flush=True)
-            hdf5 = ctypes.WinDLL(str(qgis_hdf5))
-            report_hdf5()
 
         try:
+            # AequilibraE can itself import QGIS. Keep the clean control
+            # limited to h5py, and use the plugin's import order in QGIS.
+            if sys.argv[3] == "qgis":
+                print("Importing aequilibrae.project.Project", flush=True)
+                from aequilibrae.project import Project
+
             print("Importing h5py", flush=True)
             import h5py
 
-            print(f"h5py HDF5 runtime: {h5py.version.hdf5_version}", flush=True)
-            print("Importing aequilibrae.project.Project", flush=True)
-            from aequilibrae.project import Project
+            built = ".".join(map(str, h5py.version.hdf5_built_version_tuple))
+            print(f"h5py HDF5 runtime: {h5py.version.hdf5_version} (built against {built})", flush=True)
 
             filename = Path(sys.argv[2]) / (sys.argv[3] + ".h5")
             with h5py.File(filename, "w") as output:
@@ -105,10 +103,11 @@ def test_dependencies_import_with_qgis_hdf5_loaded(tmp_path):
         for mode, result in results.items()
     )
     assert results["clean"].returncode == 0, (
-        "Dependencies fail without importing QGIS; this does not establish a QGIS HDF5 DLL conflict.\n" + diagnostics
+        "h5py fails without importing QGIS; this does not establish a QGIS HDF5 DLL conflict.\n" + diagnostics
     )
     assert results["qgis"].returncode == 0, (
-        "The clean process passed, but the QGIS/HDF5 preload process failed (issue #638). "
+        "The clean process passed, but the QGIS process failed (issue #638). "
         "Inspect the last completed stage and DLL paths below; an import failure alone does not prove a DLL conflict.\n"
         + diagnostics
     )
+    print(diagnostics)
