@@ -8,3 +8,5 @@ ty==0.0.82
 pytest-reportlog
 numpy
 pyarrow
+# The plugin installer removes bundled SciPy; the QGIS LTR image lacks a system copy.
+scipy
