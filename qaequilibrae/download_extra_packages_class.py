@@ -1,4 +1,5 @@
 import logging
+import glob
 import os
 import shutil
 import subprocess  # nosec B404
@@ -139,15 +140,10 @@ class DownloadAll:
         uv = self._find_macos_tool("uv")
         brew = self._find_macos_tool("brew")
 
-        if uv is None or brew is None:
-            missing = []
-            if uv is None:
-                missing.append("uv")
-            if brew is None:
-                missing.append("Homebrew")
+        if brew is None:
             self.error = 1
             log_message(
-                f"macOS dependency build cannot start; install {', '.join(missing)} first",
+                "macOS dependency build cannot start; install Homebrew first",
                 Qgis.MessageLevel.Critical,
             )
             return []
@@ -203,6 +199,36 @@ class DownloadAll:
                 "PATH": f"{llvm_prefix / 'bin'}{os.pathsep}{build_environment.get('PATH', '')}",
             }
         )
+
+        if uv is None:
+            # Fall back to building directly with pip if Homebrew Python headers exist
+            py_ver = f"{sys.version_info[0]}.{sys.version_info[1]}"
+            py_include = None
+            for pattern in [
+                brew_prefix / f"opt/python@{py_ver}/Frameworks/Python.framework/Versions/{py_ver}/include/python{py_ver}",
+                brew_prefix / f"Cellar/python@{py_ver}" / "*" / f"Frameworks/Python.framework/Versions/*/include/python*",
+            ]:
+                for m in [Path(p) for p in glob.glob(str(pattern))]:
+                    if (m / "Python.h").exists():
+                        py_include = m
+                        break
+                if py_include:
+                    break
+
+            if py_include:
+                direct_env = build_environment.copy()
+                direct_env["CPPFLAGS"] = f"-I{py_include} -I{llvm_prefix / 'include'} " + direct_env.get("CPPFLAGS", "")
+                direct_env["LDFLAGS"] = f"-L{llvm_prefix / 'lib'} -Wl,-rpath,{llvm_prefix / 'lib'} " + direct_env.get("LDFLAGS", "")
+                python = str(self.find_python())
+                cmd = [python, "-m", "pip", "install", package, "--target", str(self.target_folder)]
+                return self.execute(cmd, environment=direct_env)
+
+            self.error = 1
+            log_message(
+                "macOS dependency build cannot start; install uv (brew install uv) or python@3.12 (brew install python@3.12)",
+                Qgis.MessageLevel.Critical,
+            )
+            return []
 
         build_folder = Path(tempfile.mkdtemp(prefix="qaequilibrae-build-"))
         virtual_environment = build_folder / "venv"
@@ -322,11 +348,47 @@ class DownloadAll:
         # 'C:\\Program Files\\QGIS 3.30.0\\bin\\qgis-bin.exe' respectively so we need to explore in that area
         # of the filesystem
         elif sys.platform == "darwin":
-            python_exe = sys_exe.parent / f"python{sys.version_info[0]}.{sys.version_info[1]}"
+            # On macOS, QGIS runs from an app bundle where sys.executable is
+            # /Applications/QGIS.app/Contents/MacOS/QGIS.
+            # The python wrapper script is at /Applications/QGIS.app/Contents/MacOS/python
+            # (which sets PYTHONHOME appropriately for relocatable execution).
+            candidates = [
+                sys_exe.parent / "python",
+                sys_exe.parent / f"python{sys.version_info[0]}.{sys.version_info[1]}",
+                sys_exe.parent / "python3",
+                sys_exe.parent / "bin" / "python3",
+                sys_exe.parent / "bin" / "python",
+                Path(sys.base_prefix) / "bin" / "python3",
+                Path(sys.base_prefix) / "bin" / "python",
+                Path(sys.prefix) / "bin" / "python3",
+                Path(sys.prefix) / "bin" / "python",
+            ]
+            for candidate in candidates:
+                if candidate.exists() and os.access(candidate, os.X_OK):
+                    python_exe = candidate
+                    break
         elif sys.platform == "win32":
-            python_exe = Path(sys.base_prefix) / "python3.exe"
+            candidates = [
+                Path(sys.base_prefix) / "python3.exe",
+                Path(sys.base_prefix) / "python.exe",
+                Path(sys.prefix) / "python3.exe",
+                Path(sys.prefix) / "python.exe",
+                sys_exe.parent / "python3.exe",
+                sys_exe.parent / "python.exe",
+            ]
+            for candidate in candidates:
+                if candidate.exists():
+                    python_exe = candidate
+                    break
 
-        if not python_exe.exists():
+        if python_exe is None or not python_exe.exists():
+            for name in [f"python{sys.version_info[0]}.{sys.version_info[1]}", "python3", "python"]:
+                which_path = shutil.which(name)
+                if which_path:
+                    python_exe = Path(which_path)
+                    break
+
+        if python_exe is None or not python_exe.exists():
             raise FileExistsError("Can't find a python executable to use")
         print(python_exe)
         return python_exe
@@ -349,22 +411,35 @@ class DownloadAll:
                 fl.write(f"{c}\n")
 
     def clean_packages(self, target_folder):
+        if not os.path.exists(target_folder):
+            return
+        walk_result = list(os.walk(target_folder))
+        if not walk_result:
+            return
 
-        for fldr in list(os.walk(target_folder))[0][1]:
+        for fldr in walk_result[0][1]:
             for pkg in self.must_remove:
                 if pkg.lower() in fldr.lower():
-                    if os.path.isdir(os.path.join(target_folder, fldr)):
-                        shutil.rmtree(os.path.join(target_folder, fldr))
+                    pkg_path = os.path.join(target_folder, fldr)
+                    if os.path.isdir(pkg_path):
+                        shutil.rmtree(pkg_path)
                         log_message(
                             f"Duplicated packages removed from installation: {fldr}",
                         )
 
     def retry_pkg_install(self):
-        existing_files = list(os.walk(self.target_folder))[0]
-        for packages in existing_files[1]:
+        if not os.path.exists(self.target_folder):
+            self.install()
+            return
+        walk_result = list(os.walk(self.target_folder))
+        if not walk_result:
+            self.install()
+            return
+
+        for packages in walk_result[0][1]:
             shutil.rmtree(self.target_folder / packages)
 
-        for file in existing_files[2]:
+        for file in walk_result[0][2]:
             if file == "__init__.py":
                 continue
             (self.target_folder / file).unlink()
