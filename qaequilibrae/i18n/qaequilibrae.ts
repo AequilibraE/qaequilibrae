@@ -1972,7 +1972,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/transit_procedures/forms/ui_add_period.ui" line="37"/>
+        <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="100"/>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5637,7 +5637,7 @@ Select-link queries specify a name, link IDs, and AB, BA, or both directions. Re
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="224"/>
+        <location filename="../modules/network/forms/ui_add_connectors.ui" line="73"/>
         <source>Layer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5702,7 +5702,7 @@ Select-link queries specify a name, link IDs, and AB, BA, or both directions. Re
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
+        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
         <source>Layer field</source>
         <translation type="unfinished"></translation>
     </message>
