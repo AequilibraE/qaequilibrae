@@ -38,6 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: QGIS latest (Qt 6)
@@ -72,6 +73,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 30
     strategy:
+      fail-fast: false
       matrix:
         # We test the supported LTR (Qt5) and the latest release (QGIS 4, Qt6).
         # QGIS 4 keeps its profiles under QGIS4\, while the 3.x line uses QGIS3\.
