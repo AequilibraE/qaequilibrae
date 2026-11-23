@@ -3739,7 +3739,7 @@ Select-link queries specify a name, link IDs, and AB, BA, or both directions. Re
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/show_shortest_path_dialog.py" line="114"/>
+        <location filename="../modules/paths_procedures/show_shortest_path_dialog.py" line="120"/>
         <source>Display</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3749,12 +3749,12 @@ Select-link queries specify a name, link IDs, and AB, BA, or both directions. Re
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/show_shortest_path_dialog.py" line="221"/>
+        <location filename="../modules/paths_procedures/show_shortest_path_dialog.py" line="227"/>
         <source>Could not compute the path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/show_shortest_path_dialog.py" line="239"/>
+        <location filename="../modules/paths_procedures/show_shortest_path_dialog.py" line="245"/>
         <source>The shortest path output could not be loaded</source>
         <translation type="unfinished"></translation>
     </message>
