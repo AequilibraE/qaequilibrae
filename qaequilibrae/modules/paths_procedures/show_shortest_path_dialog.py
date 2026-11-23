@@ -91,7 +91,13 @@ class ShortestPathDialog(BaseDialog):
             self.qgis_project.iface_error_message(self.tr("Your network does not have mode information"))
             return self.abandon_configuration(was_ready, previous_text)
 
-        numeric_fields = [field.name() for field in self.line_layer.fields() if field.isNumeric()]
+        # SpatiaLite can return numeric values for NUMERIC columns even when isNumeric() is false.
+        is_spatialite = self.line_layer.providerType() == "spatialite"
+        numeric_fields = [
+            field.name()
+            for field in self.line_layer.fields()
+            if field.isNumeric() or (is_spatialite and field.typeName().lower() == "numeric")
+        ]
 
         dlg2 = LoadGraphLayerSettingDialog(self.qgis_project, all_modes, numeric_fields)
         dlg2.show()
