@@ -35,6 +35,7 @@ def run_with_dialog_event_loop(dialog_class, action, button_name=None):
 
     assert isinstance(dialog_filter.dialog, dialog_class), "Dialog does not have the correct class"
     assert dialog_filter.dialog.isVisible() is False, "Dialog did not close properly"
+    return dialog_filter.dialog
 
 
 def test_click_configure_graph(ae_with_project, qtbot, timeoutDetector):
@@ -50,6 +51,22 @@ def test_click_configure_graph(ae_with_project, qtbot, timeoutDetector):
         LoadGraphLayerSettingDialog,
         lambda: qtbot.mouseClick(dialog.configure_graph, Qt.MouseButton.LeftButton),
     )
+    dialog.close()
+
+
+def test_configure_graph_offers_spatialite_distance(ae_with_project, qtbot, timeoutDetector):
+    from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog
+
+    dialog = ShortestPathDialog(ae_with_project)
+    qtbot.addWidget(dialog)
+    assert dialog.line_layer.providerType() == "spatialite"
+    assert dialog.line_layer.fields().field("distance").typeName().lower() == "numeric"
+    assert isinstance(next(dialog.line_layer.getFeatures())["distance"], (int, float))
+
+    settings = run_with_dialog_event_loop(LoadGraphLayerSettingDialog, dialog.prepare_graph_and_network)
+
+    assert settings.cb_minimizing.findText("distance") >= 0
+    assert settings.cb_minimizing.findText("modes") == -1
     dialog.close()
 
 
