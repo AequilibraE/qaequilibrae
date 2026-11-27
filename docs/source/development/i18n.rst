@@ -60,7 +60,7 @@ You'll be redirected to a new page.
 
 You can check the translation status in the left column (*Text*), where the green buttons indicate
 that there is an existing translation for that string. You can insert their
-translation in the box and save it for all strings If your string happens to appear multiple times,
+translation in the box and save it for all strings. If your string happens to appear multiple times,
 Transifex will give you translation suggestions, that can match whatever you want to translate.
 This can spare you some time.
 

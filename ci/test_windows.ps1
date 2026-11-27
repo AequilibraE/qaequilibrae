@@ -66,13 +66,16 @@ if ($TestReport) {
     New-Item -ItemType Directory -Force -Path (Split-Path -Path $TestReport -Parent) | Out-Null
 }
 
-$pytestArguments = @("-m", "pytest", "test", "--durations=50", "--durations-min=1")
+$pytestArguments = @("-m", "pytest", "test", "--ignore=test/test_dependency_imports.py", "--durations=50", "--durations-min=1")
 if ($TestReport) {
     $pytestArguments += "--junitxml=$TestReport"
 }
 
 Push-Location $pluginPath
 try {
+    # Run the dependency smoke test before conftest.py imports the plugin.
+    Invoke-QgisPython -Arguments @("-m", "pytest", "--noconftest", "-rP", "test/test_dependency_imports.py") `
+        -FailureMessage "Dependency import smoke test failed"
     Invoke-QgisPython -Arguments $pytestArguments -FailureMessage "Pytest failed"
 }
 finally {

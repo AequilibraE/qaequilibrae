@@ -12,7 +12,7 @@ Model.
     :alt: tab trip distribution
 
 Unlike the other menus in QAequilibraE, all three procedures in trip distribution share some
-configuring stepa. We'll go over each tab and, in the end, we'll run a basic workflow
+configuring steps. We'll go over each tab and, in the end, we'll run a basic workflow
 using Sioux Falls example.
 
 "*Load datasets*" is the first tab and contains a loading button and a dataset table at
@@ -193,7 +193,7 @@ in the menu (2), and click *Load* (3), pointing to the location of the vector fi
     :align: center
     :alt: IPF - Load dataset from file
 
-Case you are loading from an open layer, just click *Import from layer*, point the available data
+If you are loading from an open layer, just click *Import from layer*, point the available data
 layer (1), and the name of its index column (2). Let's choose to only *Use data* (3).
 
 .. image:: ../images/trip_distribution/ipf_3.png
@@ -293,7 +293,7 @@ machine.
     :align: center
     :alt: Apply gravity - Load dataset from file
 
-Case you are loading from an open layer, just click *Import from layer*, point the available data
+If you are loading from an open layer, just click *Import from layer*, point the available data
 layer (1), and the name of its index column (2). Let's choose to only *Use data* (3).
 
 .. image:: ../images/trip_distribution/apply_gravity_3.png

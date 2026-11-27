@@ -24,12 +24,12 @@ modify the passenger car equivalent (PCE) for whatever value applies in your ana
 as include the value of time (VOT) as fixed cost. It is also possible to remove links from the
 analysis by selecting them before opening the Traffic Assignment window, and toggling the button
 *Remove selected links from the graph*. More about 
-`graph configuration <https://www.aequilibrae.com/develop/python/path_computation/aequilibrae_graph.html>`_
+`graph configuration <https://www.aequilibrae.com/latest/python/path_computation/aequilibrae_graph.html>`_
 can be found in the AequilibraE documentation.
 
 .. important::
 
-    For setting a fixed cost, one **must** have a value fot the *vot* column in the project
+    For setting a fixed cost, one **must** have a value for the *vot* column in the project
     *modes* table.
 
 .. image:: ../images/traffic_assignment/traffic_assignment_traffic_classes.png

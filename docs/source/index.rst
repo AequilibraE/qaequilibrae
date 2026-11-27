@@ -16,7 +16,7 @@ QGIS
       :link-type: any
       :text-align: center
       
-      New to AequilibraE? Don't know hot to install the plugin or just feeling lost?
+      New to AequilibraE? Don't know how to install the plugin or just feeling lost?
       Get started here!
 
    .. grid-item-card:: :material-outlined:`menu_book;1.5em` Menus in Detail
@@ -35,7 +35,7 @@ QGIS
       :text-align: center
       
       Want to enhance your experience with AequilibraE? 
-      Dive in our processing provider tools!
+      Dive into our processing provider tools!
 
    .. grid-item-card:: :material-outlined:`question_mark;1.5em` Frequently Asked Questions
       :link: faqs
