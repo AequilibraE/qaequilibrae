@@ -89,6 +89,33 @@ the 'Run procedures' to validate the installation.
     :align: center
     :alt: run module missing requirements
 
+To make a procedure cancelable, give the function a ``task`` parameter.
+Set ``cancelable: true`` for the procedure in ``parameters.yml`` to show the **Cancel** button.
+Check ``task.isCanceled()`` between steps and stop the procedure when it returns ``True``.
+
+For example:
+
+.. code-block:: python
+
+    import subprocess
+
+    def test_procedure_ping(task):
+        host = "google.com"
+        command = ['ping', '-n', '1', host]
+        for _ in range(10):
+            if task.isCanceled():
+                return
+            subprocess.run(command, capture_output=True, text=True)
+
+And in the `parameters.yml` file:
+
+.. code-block:: yml
+
+    run:
+      test_procedure_ping:
+        cancelable: true
+
+
 Scenarios
 ---------
 

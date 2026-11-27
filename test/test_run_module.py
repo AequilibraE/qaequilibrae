@@ -8,7 +8,12 @@ from qgis.core import Qgis
 from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QApplication, QMessageBox
 
-from qaequilibrae.modules.project_procedures.run_module_dialog import LogBridge, RunModuleDialog, has_content
+from qaequilibrae.modules.project_procedures.run_module_dialog import (
+    LogBridge,
+    RunLogDialog,
+    RunModuleDialog,
+    has_content,
+)
 from .utilities import create_matrix
 
 functions = {0: "matrix_summary", 1: "graph_summary", 2: "results_summary", 3: "example_function_with_kwargs"}
@@ -120,6 +125,49 @@ def test_second_run_gets_a_fresh_log_window(coquimbo_project, qtbot):
 
     messagebar = coquimbo_project.iface.messageBar()
     assert len(messagebar.messages[Qgis.MessageLevel.Success]) == 2
+
+
+def test_cancel_running_procedure(coquimbo_project, qtbot):
+    add_run_function(
+        coquimbo_project,
+        "cancelable_procedure",
+        "from time import monotonic, sleep\n"
+        "def cancelable_procedure(task):\n"
+        "    print('Ready to cancel', flush=True)\n"
+        "    deadline = monotonic() + 15\n"
+        "    while not task.isCanceled():\n"
+        "        if monotonic() > deadline:\n"
+        "            raise RuntimeError('Cancellation was not received')\n"
+        "        sleep(0.01)\n",
+        parameters={"cancelable": True},
+    )
+    dialog = RunModuleDialog(coquimbo_project)
+    select_function(dialog, "cancelable_procedure")
+    qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
+
+    log_dialog = dialog.log_dialog
+    qtbot.waitUntil(lambda: "Ready to cancel" in log_dialog.text.toPlainText(), timeout=10_000)
+    assert log_dialog.cancel_button.isEnabled()
+    with qtbot.waitSignal(dialog.run_completed, timeout=10_000):
+        qtbot.mouseClick(log_dialog.cancel_button, Qt.MouseButton.LeftButton)
+
+    assert "Model run canceled" in log_dialog.text.toPlainText()
+    assert not log_dialog.cancel_button.isEnabled()
+    assert dialog.but_run.isEnabled()
+    messagebar = coquimbo_project.iface.messageBar()
+    assert not messagebar.messages[Qgis.MessageLevel.Success]
+    assert not messagebar.messages[Qgis.MessageLevel.Critical]
+
+
+def test_cancel_without_registered_task(qtbot):
+    dialog = RunLogDialog(cancelable=True)
+    qtbot.addWidget(dialog)
+    dialog.show()
+    assert not dialog.cancel_button.isEnabled()
+    dialog.set_task_id(0)  # QGIS reserves zero for an invalid task ID.
+    qtbot.mouseClick(dialog.cancel_button, Qt.MouseButton.LeftButton)
+    assert dialog.isVisible()
+    assert not dialog.cancel_button.isEnabled()
 
 
 def test_dataframe_result_is_reported(coquimbo_project, qtbot):

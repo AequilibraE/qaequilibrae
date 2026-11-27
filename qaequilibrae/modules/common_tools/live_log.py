@@ -138,6 +138,7 @@ class LiveLogDialog(QDialog):
 
         self.buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         self.buttons.rejected.connect(self.reject)
+
         layout.addWidget(self.buttons)
 
         self.setLayout(layout)

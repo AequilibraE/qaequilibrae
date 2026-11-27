@@ -3451,7 +3451,7 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="387"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="92"/>
         <source>Model run canceled</source>
         <translation type="unfinished"/>
     </message>

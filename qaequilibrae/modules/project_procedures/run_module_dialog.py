@@ -4,6 +4,7 @@ import pprint
 import re
 import subprocess  # nosec B404
 import sys
+from functools import partial
 from importlib.util import find_spec
 from os.path import dirname, isfile, join
 from pathlib import Path
@@ -11,7 +12,7 @@ from pathlib import Path
 from qgis.core import Qgis, QgsApplication, QgsMessageLog, QgsTask
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import QTimer, pyqtSignal
-from qgis.PyQt.QtWidgets import QMessageBox
+from qgis.PyQt.QtWidgets import QDialogButtonBox, QMessageBox, QPushButton
 
 from qaequilibrae.download_extra_packages_class import DownloadAll
 from qaequilibrae.modules.common_tools import BaseDialog, LiveLogBridge, LiveLogDialog
@@ -79,9 +80,32 @@ LogBridge = LiveLogBridge
 
 
 class RunLogDialog(LiveLogDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, cancelable=False):
         super().__init__("", parent=parent, initial_indeterminate=True)
         self.setWindowTitle(self.tr("Model Run"))
+
+        self.task_id = None
+        self.cancel_button = None
+        if cancelable:
+            self.cancel_button = QPushButton(self.tr("Cancel"))
+            self.cancel_button.setEnabled(False)
+            self.buttons.addButton(self.cancel_button, QDialogButtonBox.ButtonRole.ActionRole)
+            self.cancel_button.clicked.connect(self.request_cancellation)
+
+    def set_task_id(self, task_id: int | None):
+        self.task_id = task_id
+        if self.cancel_button is not None:
+            self.cancel_button.setEnabled(task_id is not None)
+
+    def request_cancellation(self):
+        task_id = self.task_id
+        self.set_task_id(None)
+        if task_id is None:
+            return
+        task = QgsApplication.taskManager().task(task_id)
+        if task is not None:
+            task.cancel()
+            self.close()
 
 
 class LogTailer:
@@ -328,7 +352,15 @@ class RunModuleDialog(BaseDialog):
         if self.log_dialog is not None and not sip.isdeleted(self.log_dialog):
             # Log windows from earlier runs stay parented to this dialog otherwise
             self.log_dialog.deleteLater()
-        self.log_dialog = RunLogDialog(self)
+
+        parameters = self.project.parameters["run"][func_name] or {}
+        cancelable = bool(parameters.get("cancelable", False))
+        # Project.run binds all parameter keys as kwargs; this one configures the dialog only.
+        if "cancelable" in parameters and isinstance(func, partial):
+            kwargs = {key: value for key, value in func.keywords.items() if key != "cancelable"}
+            func = partial(func.func, *func.args, **kwargs)
+
+        self.log_dialog = RunLogDialog(self, cancelable)
         self.log_dialog.connect_bridge(self.bridge)
         self.log_dialog.show()
 
@@ -341,20 +373,25 @@ class RunModuleDialog(BaseDialog):
 
         # Avoid QgsTaskWrapper truth-testing DataFrames/arrays on completion.
         outcome = {}
+        finished = self._on_finished(func_name, outcome)
         self.task = QgsTask.fromFunction(
             self.tr("Running {}").format(func_name),
-            self._worker(func, outcome),
-            on_finished=self._on_finished(func_name, outcome),
+            self._worker(func, outcome, cancelable),
+            on_finished=finished,
+            flags=QgsTask.Flag.CanCancel if cancelable else QgsTask.Flags(),
         )
-        QgsApplication.taskManager().addTask(self.task)
+        task_id = QgsApplication.taskManager().addTask(self.task)
+        if not task_id:
+            finished(RuntimeError(self.tr("Could not start the model run")))
+        elif cancelable:
+            self.log_dialog.set_task_id(task_id)
 
-    def _worker(self, func, outcome):
-        """Build the background callable without touching dialog state there."""
+    def _worker(self, func, outcome, pass_task):
+        """Build the background callable, passing the task only to cancelable procedures."""
         bridge = self.bridge
         running_msg = self.tr("Model running, please wait...")
         done_msg = self.tr("Model run finished!")
 
-        # The task manager always passes the task in, even though nothing here needs it
         def worker(task):
             import traceback
 
@@ -368,8 +405,9 @@ class RunModuleDialog(BaseDialog):
 
             try:
                 QgsMessageLog.logMessage(running_msg, MESSAGE_TAG, Qgis.MessageLevel.Info)
-                outcome["result"] = func()
-                QgsMessageLog.logMessage(done_msg, MESSAGE_TAG, Qgis.MessageLevel.Info)
+                outcome["result"] = func(task=task) if pass_task else func()
+                if not task.isCanceled():
+                    QgsMessageLog.logMessage(done_msg, MESSAGE_TAG, Qgis.MessageLevel.Info)
 
             except Exception:
                 QgsMessageLog.logMessage(traceback.format_exc(), MESSAGE_TAG, Qgis.MessageLevel.Critical)
@@ -401,12 +439,13 @@ class RunModuleDialog(BaseDialog):
             if alive:
                 self.but_run.setEnabled(True)
                 if self.log_dialog is not None and not sip.isdeleted(self.log_dialog):
+                    self.log_dialog.set_task_id(None)
                     self.log_dialog.mark_finished()
-                    self.log_dialog.append(finished_msg)
+                    self.log_dialog.append(canceled_msg if canceled else finished_msg)
 
             try:
                 if canceled:
-                    self.qgis_project.iface_error_message(canceled_msg)
+                    self.qgis_project.iface_info_message(canceled_msg)
                     return
 
                 if exception is not None:
