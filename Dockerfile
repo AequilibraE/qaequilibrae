@@ -1,8 +1,9 @@
 ARG QGIS_BASE_IMAGE=qgis/qgis:ltr
 FROM ${QGIS_BASE_IMAGE}
 
+# The plugin uses the system SciPy rather than bundling its own copy.
 RUN apt update -y \
-    && apt install -y --no-install-recommends pandoc zip \
+    && apt install -y --no-install-recommends pandoc python3-scipy zip \
     && rm -rf /var/lib/apt/lists/*
 
 COPY test/requirements_test.txt /tmp/requirements_test.txt
