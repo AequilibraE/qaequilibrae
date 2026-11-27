@@ -4,6 +4,7 @@ import pprint
 import re
 import subprocess  # nosec B404
 import sys
+from functools import partial
 from importlib.util import find_spec
 from os.path import dirname, isfile, join
 from pathlib import Path
@@ -11,7 +12,7 @@ from pathlib import Path
 from qgis.core import Qgis, QgsApplication, QgsMessageLog, QgsTask
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import QTimer, pyqtSignal
-from qgis.PyQt.QtWidgets import QMessageBox, QPushButton, QDialogButtonBox
+from qgis.PyQt.QtWidgets import QDialogButtonBox, QMessageBox, QPushButton
 
 from qaequilibrae.download_extra_packages_class import DownloadAll
 from qaequilibrae.modules.common_tools import BaseDialog, LiveLogBridge, LiveLogDialog
@@ -83,23 +84,28 @@ class RunLogDialog(LiveLogDialog):
         super().__init__("", parent=parent, initial_indeterminate=True)
         self.setWindowTitle(self.tr("Model Run"))
 
+        self.task_id = None
+        self.cancel_button = None
         if cancelable:
-            # Add generic button to cancel
-            self.cancel_button = QPushButton("Cancel")
-            self.buttons.addButton(self.cancel_button, QDialogButtonBox.ActionRole)
-            self.cancel_button.clicked.connect(self.cancel_actions_function)
+            self.cancel_button = QPushButton(self.tr("Cancel"))
+            self.cancel_button.setEnabled(False)
+            self.buttons.addButton(self.cancel_button, QDialogButtonBox.ButtonRole.ActionRole)
+            self.cancel_button.clicked.connect(self.request_cancellation)
 
-    def set_task_id(self, task_id):
+    def set_task_id(self, task_id: int | None):
         self.task_id = task_id
+        if self.cancel_button is not None:
+            self.cancel_button.setEnabled(task_id is not None)
 
-    def cancel_actions_function(self):
-        if self.task_id is None:
-            QgsMessageLog.logMessage(
-                self.tr("Cannot cancel task without task id"), MESSAGE_TAG, Qgis.MessageLevel.Warning
-            )
-        QgsApplication.taskManager().task(self.task_id).cancel()
-        QgsMessageLog.logMessage(self.tr("Model run canceled"), MESSAGE_TAG, Qgis.MessageLevel.Info)
-        self.close()
+    def request_cancellation(self):
+        task_id = self.task_id
+        self.set_task_id(None)
+        if task_id is None:
+            return
+        task = QgsApplication.taskManager().task(task_id)
+        if task is not None:
+            task.cancel()
+            self.close()
 
 
 class LogTailer:
@@ -347,11 +353,12 @@ class RunModuleDialog(BaseDialog):
             # Log windows from earlier runs stay parented to this dialog otherwise
             self.log_dialog.deleteLater()
 
-        # enables the cancelable option
-        cancelable = (
-            "cancelable" in self.project.parameters["run"][func_name]
-            and self.project.parameters["run"][func_name]["cancelable"]
-        )
+        parameters = self.project.parameters["run"][func_name] or {}
+        cancelable = bool(parameters.get("cancelable", False))
+        # Project.run binds all parameter keys as kwargs; this one configures the dialog only.
+        if "cancelable" in parameters and isinstance(func, partial):
+            kwargs = {key: value for key, value in func.keywords.items() if key != "cancelable"}
+            func = partial(func.func, *func.args, **kwargs)
 
         self.log_dialog = RunLogDialog(self, cancelable)
         self.log_dialog.connect_bridge(self.bridge)
@@ -366,27 +373,25 @@ class RunModuleDialog(BaseDialog):
 
         # Avoid QgsTaskWrapper truth-testing DataFrames/arrays on completion.
         outcome = {}
+        finished = self._on_finished(func_name, outcome)
         self.task = QgsTask.fromFunction(
             self.tr("Running {}").format(func_name),
-            self._worker(func, outcome, cancelable), # passTask = cancelable -> need to pass task to cancel
-            on_finished=self._on_finished(func_name, outcome),
-            flags=QgsTask.CanCancel if cancelable else QgsTask.AllFlags,
+            self._worker(func, outcome, cancelable),
+            on_finished=finished,
+            flags=QgsTask.Flag.CanCancel if cancelable else QgsTask.Flags(),
         )
-        # Task id to send cancel signal
         task_id = QgsApplication.taskManager().addTask(self.task)
-        if task_id != 0: 
+        if not task_id:
+            finished(RuntimeError(self.tr("Could not start the model run")))
+        elif cancelable:
             self.log_dialog.set_task_id(task_id)
 
-    def _worker(self, func, outcome, passTask):
-        """
-        Build the background callable without touching dialog state there.
-        Pass the task to the function if requested (usually if cancelable)
-        """
+    def _worker(self, func, outcome, pass_task):
+        """Build the background callable, passing the task only to cancelable procedures."""
         bridge = self.bridge
         running_msg = self.tr("Model running, please wait...")
         done_msg = self.tr("Model run finished!")
 
-        # The task manager always passes the task in, even though nothing here needs it
         def worker(task):
             import traceback
 
@@ -400,8 +405,9 @@ class RunModuleDialog(BaseDialog):
 
             try:
                 QgsMessageLog.logMessage(running_msg, MESSAGE_TAG, Qgis.MessageLevel.Info)
-                outcome["result"] = func() if not passTask else func(task=task)
-                QgsMessageLog.logMessage(done_msg, MESSAGE_TAG, Qgis.MessageLevel.Info)
+                outcome["result"] = func(task=task) if pass_task else func()
+                if not task.isCanceled():
+                    QgsMessageLog.logMessage(done_msg, MESSAGE_TAG, Qgis.MessageLevel.Info)
 
             except Exception:
                 QgsMessageLog.logMessage(traceback.format_exc(), MESSAGE_TAG, Qgis.MessageLevel.Critical)
@@ -433,8 +439,9 @@ class RunModuleDialog(BaseDialog):
             if alive:
                 self.but_run.setEnabled(True)
                 if self.log_dialog is not None and not sip.isdeleted(self.log_dialog):
+                    self.log_dialog.set_task_id(None)
                     self.log_dialog.mark_finished()
-                    self.log_dialog.append(finished_msg)
+                    self.log_dialog.append(canceled_msg if canceled else finished_msg)
 
             try:
                 if canceled:

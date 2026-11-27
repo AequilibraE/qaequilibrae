@@ -89,14 +89,17 @@ the 'Run procedures' to validate the installation.
     :align: center
     :alt: run module missing requirements
 
-For long-running procedures, you may wish to be able to cancel them while they are running. To do this, include a `task` and a `cancelable` argument in the function definition. 
-In the `parameters.yml` file, include the `cancelable` argument and set it to true. This will enable the 'Cancel' button. 
-In the task, manually query `task.isCanceled()` and cancel your task throughout the function. Then to cancel, click the 'Cancel' button after starting the task.
-An example of a function is:
+To make a procedure cancelable, give the function a ``task`` parameter.
+Set ``cancelable: true`` for the procedure in ``parameters.yml`` to show the **Cancel** button.
+Check ``task.isCanceled()`` between steps and stop the procedure when it returns ``True``.
+
+For example:
 
 .. code-block:: python
 
-    def test_procedure_ping(task, cancelable=True):
+    import subprocess
+
+    def test_procedure_ping(task):
         host = "google.com"
         command = ['ping', '-n', '1', host]
         for _ in range(10):
